@@ -104,7 +104,22 @@ app.put('/:_id', (req, res) => {
     })
 })
 
+// Delete elimina un registro
 
+app.delete('/:_id', (req, res) => {
+    let posicion = clientes.findIndex(elem => {
+        return elem._id === req.params._id;
+    })
+    if (posicion < 0) {
+        return res.status(404).json({
+            mensaje: 'No se encontró ningún cliente con ese _id'
+        })
+    }
+    let clienteEliminado = clientes.splice(posicion, 1);
+    res.status(200).json({
+        mensaje: `El cliente ${clienteEliminado[0].nombre} ha sido eliminado correctamente`
+    })
+})
 
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
