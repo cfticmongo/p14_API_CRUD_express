@@ -74,6 +74,36 @@ app.post('/', (req, res) => {
     })
 })
 
+// Put para actualizar (o crear) un nuevo registro
+
+app.put('/:_id', (req, res) => {
+    if(!req.body || JSON.stringify(req.body) === JSON.stringify({})) {
+        return res.status(400).json({
+            mensaje: 'Datos de cliente no válido'
+        })
+    }
+    let posicion = clientes.findIndex(elem => {
+        return elem._id === req.params._id;
+    })
+    if (posicion < 0) {
+        return res.status(404).json({
+            mensaje: 'No se encontró ningún cliente con ese _id'
+        })
+    }
+    if(req.body.nombre) {
+      clientes[posicion].nombre = req.body.nombre.toLowerCase();
+    }
+    if(req.body.cif) {
+        clientes[posicion].cif = req.body.cif;
+    }
+    if(req.body.localidad) {
+        clientes[posicion].localidad = req.body.localidad.toLowerCase();
+    }
+    res.status(201).json({
+        mensaje: `El cliente ${clientes[posicion].nombre} ha sido actualizado correctamente`
+    })
+})
+
 
 
 app.listen(port, () => {
