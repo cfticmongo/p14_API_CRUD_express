@@ -1,12 +1,16 @@
 const express = require('express');
 const app = express();
+const uuid = require('uuid');
 const port = 3000;
 
 let clientes = [
-    {_id: 1, nombre: 'gas natural', cif: 'A12345678', localidad: 'madrid'},
-    {_id: 2, nombre: 'jazztel', cif: 'A87654321', localidad: 'madrid'},
-    {_id: 3, nombre: 'iberdrola', cif: 'A4443241', localidad: 'bilbao'}
+    {_id: uuid.v4(), nombre: 'gas natural', cif: 'A12345678', localidad: 'madrid'},
+    {_id: uuid.v4(), nombre: 'jazztel', cif: 'A87654321', localidad: 'madrid'},
+    {_id: uuid.v4(), nombre: 'iberdrola', cif: 'A4443241', localidad: 'bilbao'}
 ]
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 // Get para todos los registros
 
@@ -22,7 +26,7 @@ app.get('/', (req, res) => {
 
 app.get('/cliente-id/:_id', (req, res) => {
     let cliente = clientes.find(elem => {
-        return elem._id === Number(req.params._id);
+        return elem._id === req.params._id;
     })
     if(cliente === undefined) {
         return res.status(404).json({
@@ -47,6 +51,26 @@ app.get('/cliente-localidad', (req, res) => {
     res.status(200).json({
         mensaje: 'ok',
         clientesSeleccionados
+    })
+})
+
+// Post para crear un nuevo registro
+
+app.post('/', (req, res) => {
+    if(!req.body || JSON.stringify(req.body) === JSON.stringify({})) {
+        return res.status(400).json({
+            mensaje: 'Datos de cliente no válido'
+        })
+    }
+    let cliente = req.body;
+    cliente._id = uuid.v4();
+    cliente.nombre = cliente.nombre.toLowerCase();
+    if(cliente.localidad) {
+        cliente.localidad = cliente.localidad.toLowerCase();
+    }
+    clientes.push(cliente);
+    res.status(200).json({
+        mensaje: `El cliente ${cliente.nombre} ha sido creado correctamente`
     })
 })
 
